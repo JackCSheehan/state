@@ -1,1 +1,2 @@
 INPUT p "push"
+STATE locked [coin: unlocked, push: locked]
