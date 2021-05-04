@@ -2,7 +2,9 @@
 #include "compiler.h"
 
 int main() {
-	Compiler c("main.cpp");
-	printf("Hello World!");
+	Compiler c("main.statelang");
+	
+	c.parse();
+
 	return 0;
 }
