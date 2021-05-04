@@ -1,5 +1,4 @@
 #include "compiler.h"
-// TODO: work on parsing parseState -> .split isn't a legit function, write private function to do that
 // Takes strings of source file path
 Compiler::Compiler(string p) {
 	src.open(p);
