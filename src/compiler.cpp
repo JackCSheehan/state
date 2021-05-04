@@ -1,13 +1,13 @@
 #include "compiler.h"
 // TODO: work on parsing parseState -> .split isn't a legit function, write private function to do that
 // Takes strings of source file path
-Compiler::Compiler(string f) {
-	src.open(f);
+Compiler::Compiler(string p) {
+	src.open(p);
+	compiledName = p.substr(0, p.find_last_of(".")) + ".cpp";
 }
 
 // Closes source
 Compiler::~Compiler() {
-	src.close();
 }
 
 // Trims whitespace from either end of given string
@@ -121,6 +121,31 @@ void Compiler::parseStatement(string line) {
 
 }
 
+// Compile parsed data to a compiled file
+void Compiler::compile() {
+	// Ofstream to write to compiled file
+	ofstream f(compiledName);
+
+	// Write enum for input alphabet
+	f << "enum InputAlphabet {\n";
+	for (auto& input : inputs) {
+		f << "\t" << input.first << " = \"" << input.second << "\",\n";
+	}
+	f << "};\n";
+
+	// Write enum for state
+	f << "enum State {\n";
+	for (auto& state : states) {
+		f << "\t" << state.first << ",\n";
+	}
+	f << "};\n";
+
+	// Write main
+	f << "int main() {\n" << "\treturn 0;\n}";
+
+	f.close();
+}
+
 // Parses source files
 void Compiler::parse() {
 	// Current line in source
@@ -133,4 +158,9 @@ void Compiler::parse() {
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
 		else parseStatement(line);
 	}
+
+	src.close();
+
+	// After inputs and states parsed, compile
+	compile();
 }

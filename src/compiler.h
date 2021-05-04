@@ -26,6 +26,7 @@ using namespace std;
 // Class containing code needed to parse source and write compiled code
 class Compiler {
 private:
+	string compiledName;						// Name of compiled file
 	ifstream src;								// Source code file
 	map<string, string> inputs;					// Maps input name to input string
 	map<string, map<string, string>> states;	// States and input -> state mappings
@@ -33,14 +34,16 @@ private:
 	static string trim(string);
 	static void split(string, char, string*);
 
+	void parseInput(string);
+	void parseState(string);
+	void parseStatement(string);
+
 public:
 	Compiler(string);
 	~Compiler();
 
-	void parseInput(string);
-	void parseState(string);
-	void parseStatement(string);
 	void parse();
+	void compile();
 };
 
 

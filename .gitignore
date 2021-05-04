@@ -32,3 +32,6 @@
 *.app
 
 *.txt
+*.statelang
+test
+test.cpp
