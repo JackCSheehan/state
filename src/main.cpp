@@ -2,7 +2,7 @@
 #include "compiler.h"
 
 int main() {
-	Compiler c("main.statelang");
+	Compiler c("test/test.statelang");
 	
 	c.parse();
 
