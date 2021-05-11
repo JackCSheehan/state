@@ -1,6 +1,8 @@
 #ifndef WRITER_H
 #define WRITER_H
 
+#define INPUT_SIZE 100
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -15,11 +17,10 @@ private:
 	map<string, string>* inputs;				// Pointer to inputs parsed from source
 	map<string, map<string, string>>* states;	// Pointer to states parsed from source
 
+	void writeIncludes();
 	void declareAlphabet();
 	void declareStates();
-	void startMain();
 	void writeLogic();
-	void endMain();
 public:
 	Writer(string, map<string, string>*, map<string, map<string, string>>*);
 	~Writer();
