@@ -122,27 +122,8 @@ void Compiler::parseStatement(string line) {
 
 // Compile parsed data to a compiled file
 void Compiler::compile() {
-	// Ofstream to write to compiled file
-	ofstream f(compiledName);
-
-	// Write enum for input alphabet
-	f << "enum InputAlphabet {\n";
-	for (auto& input : inputs) {
-		f << "\t" << input.first << " = \"" << input.second << "\",\n";
-	}
-	f << "};\n";
-
-	// Write enum for state
-	f << "enum State {\n";
-	for (auto& state : states) {
-		f << "\t" << state.first << ",\n";
-	}
-	f << "};\n";
-
-	// Write main
-	f << "int main() {\n" << "\treturn 0;\n}";
-
-	f.close();
+	Writer w(compiledName, &inputs, &states);
+	w.write();
 }
 
 // Parses source files
@@ -159,7 +140,4 @@ void Compiler::parse() {
 	}
 
 	src.close();
-
-	// After inputs and states parsed, compile
-	compile();
 }

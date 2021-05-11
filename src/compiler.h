@@ -20,6 +20,7 @@
 #include <regex>
 #include <algorithm>
 #include <map>
+#include "writer.h"
 
 using namespace std;
 
