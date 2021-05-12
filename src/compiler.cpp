@@ -7,6 +7,7 @@ Compiler::Compiler(string p) {
 
 // Closes source
 Compiler::~Compiler() {
+	src.close();
 }
 
 // Trims whitespace from either end of given string
@@ -138,6 +139,4 @@ void Compiler::parse() {
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
 		else parseStatement(line);
 	}
-
-	src.close();
 }

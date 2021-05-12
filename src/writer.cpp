@@ -19,14 +19,6 @@ void Writer::writeIncludes() {
 	  << "using namespace std;\n";
 }
 
-// Declares constants for alphabet in target file
-void Writer::declareAlphabet() {
-	// Write enum for input alphabet
-	for (auto& input : *inputs) {
-		f << "const string " << input.first << " = \"" << input.second << "\";\n";
-	}
-}
-
 // Declares enum for states in target file
 void Writer::declareStates() {
 	// Write enum for state
@@ -68,7 +60,7 @@ void Writer::writeLogic() {
 			}
 
 			// Write state transition logic
-			f << "in == " << trans.first << ") state = " << trans.second << ";\n";
+			f << "in == \"" << inputs->operator[](trans.first) << "\") state = " << trans.second << ";\n";
 		}
 	}
 	// Close switch, while loop, and main
@@ -78,7 +70,6 @@ void Writer::writeLogic() {
 // Function to drive helper functions to compile to target language
 void Writer::write() {
 	writeIncludes();
-	declareAlphabet();
 	declareStates();
 	writeLogic();
 }
