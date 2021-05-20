@@ -1,12 +1,12 @@
 #ifndef WRITER_H
 #define WRITER_H
 
-#define INPUT_SIZE 100
-
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <map>
+#include "compiler.h"
+#include "error.h"
 
 using namespace std;
 
