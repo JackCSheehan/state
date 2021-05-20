@@ -24,8 +24,17 @@ void Writer::declareStates() {
 	// Write enum for state
 	f << "enum State {\n";
 	for (auto& state : *states) {
+		// Throw error if user tries to define their own end state
+		if (state.first == END_STATE) {
+			Error::endStateClash();
+		}
+
 		f << "\t" << state.first << ",\n";
 	}
+
+	// Write built-in END state
+	f << "\t" << END_STATE << ",\n";
+
 	f << "};\n";
 }
 
@@ -37,7 +46,7 @@ void Writer::writeLogic() {
 	// Declare input variable, starting state, while loop opening, and switch head
 	f << "\tchar in[" << INPUT_SIZE << "];\n"
 	  << "\tState state = " << states->begin()->first << ";\n"
-	  << "\twhile(1) {\n"
+	  << "\twhile(state != " << END_STATE << ") {\n"
 	  << "\t\tswitch(state) {\n";
 
 	// Flag to determine if "if" should be written
@@ -62,6 +71,8 @@ void Writer::writeLogic() {
 			// Write state transition logic
 			f << "in == \"" << inputs->operator[](trans.first) << "\") state = " << trans.second << ";\n";
 		}
+
+		f << "\t\t\tbreak;\n";
 	}
 	// Close switch, while loop, and main
 	f << "\t\t}\n\t}\n}";

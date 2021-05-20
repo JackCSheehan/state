@@ -10,6 +10,10 @@
 #define MAP_CLOSE "]"
 #define BODY_START "{"
 #define BODY_END "}"
+#define END_STATE "END"
+
+
+#define INPUT_SIZE 100
 
 #include <cstdio>
 #include <cctype>
@@ -30,7 +34,7 @@ private:
 	string compiledName;						// Name of compiled file
 	ifstream src;								// Source code file
 	map<string, string> inputs;					// Maps input name to input string
-	map<string, map<string, string>> states;	// States and input -> state mappings
+	map<string, map<string, string>> states;	// Maps states to transitions: state names -> (input -> another state name)
 
 	static string trim(string);
 	static void split(string, char, string*);
