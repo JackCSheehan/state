@@ -10,7 +10,12 @@ using namespace std;
 
 // Namespace with functions needed to throw errors
 namespace Error {
-	void endStateClash();
+	void endStateClash(int);
+	void missingClosingBrace(int);
+	void missingOpeningBrace(int);
+	void unknownOutputAction(int);
+	void incorrectlyPlacedInputAction(int);
+	void malformedAction(int);
 }
 
 #endif

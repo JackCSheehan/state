@@ -4,9 +4,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 #include <map>
 #include "compiler.h"
-#include "error.h"
+#include "action.h"
 
 using namespace std;
 
@@ -16,13 +17,17 @@ private:
 	ofstream f;									// Ofstream to write to compiled file
 	map<string, string>* inputs;				// Pointer to inputs parsed from source
 	map<string, map<string, string>>* states;	// Pointer to states parsed from source
+	map<string, vector<Action>>* outputActions;	// Pointer to output actions parsed from source
 
 	void writeIncludes();
 	void declareAlphabet();
 	void declareStates();
 	void writeLogic();
+
+	void writePrint(string);
+	void writeWrite(string);
 public:
-	Writer(string, map<string, string>*, map<string, map<string, string>>*);
+	Writer(string, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*);
 	~Writer();
 
 	void write();
