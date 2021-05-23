@@ -123,7 +123,7 @@ void Writer::writeOutputAction(Action action) {
 	if (action.name == PRINT) {
 		f << "cout << \"" << action.arg << "\";\n";
 	} else {
-		f << action.identifier << "<< \"" << action.arg << "\";\n";
+		f << action.identifier << " << \"" << action.arg << "\";\n";
 	}
 }
 
