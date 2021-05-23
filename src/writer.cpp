@@ -68,7 +68,7 @@ void Writer::writeLogic() {
 			f << "in == \"" << inputs->operator[](trans.first) << "\") {\n";
 			
 			// Write state transition logic
-			f << "\t\t\tstate = "<< trans.second << ";\n";
+			f << "\t\t\t\tstate = "<< trans.second << ";\n";
 
 			// Get output actions associated with this state
 			vector<Action> currentActions = outputActions->operator[](state.first);
@@ -76,10 +76,9 @@ void Writer::writeLogic() {
 			// Iterate through actions and write them
 			for (Action a : currentActions) {
 				// Write tab to properly indent this action
-				f << "\t\t\t";
+				f << "\t\t\t\t";
 
-				if (a.name == PRINT) writePrint(a.arg);
-				else if (a.name == WRITE) writeWrite(a.arg);
+				writeOutputAction(a);
 
 				f << "\n";
 			}
@@ -95,15 +94,39 @@ void Writer::writeLogic() {
 	f << "\t\t}\n\t}\n\treturn 0;\n}";
 }
 
-// Writes a print action with given args. State's print action is equivalent to C's printf
-void Writer::writePrint(string args) {
-	f << "printf(" << args << ");\n";
+// Writes the given output action with given args
+void Writer::writeOutputAction(Action action) {
+	// Get size of IN variable name
+	static const int IN_LEN = string(IN_MARKER).size();
+
+	// Get position of first occurrence of the IN marker
+	size_t inPos = action.arg.find(IN);
+
+	// Vector of positions in line where the in marker is used
+	vector<size_t> inReferences;
+
+	// Find all occurrences of the in marker in this action's arg
+	while (inPos != string::npos) {
+		// Add position of reference to list
+		inReferences.push_back(inPos);
+
+		// Find next reference to the in marker
+		inPos = action.arg.substr(inPos).find(IN);
+	}
+
+	// Replace each reference to in with the name of the in variable
+	for (int pos : inReferences) {
+		action.arg.replace(pos, IN_LEN, "\" << \"" IN " << \"");
+	}
+
+	// Write statement depending on which output action this line has
+	if (action.name == PRINT) {
+		f << "cout << \"" << action.arg << "\";\n";
+	} else {
+		f << action.identifier << "<< \"" << action.arg << "\";\n";
+	}
 }
 
-// Writes a write action with given args. W
-void Writer::writeWrite(string args) {
-	f << "//fprintf(\n";
-}
 
 // Function to drive helper functions to compile to target language
 void Writer::write() {

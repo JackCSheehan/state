@@ -24,8 +24,7 @@ private:
 	void declareStates();
 	void writeLogic();
 
-	void writePrint(string);
-	void writeWrite(string);
+	void writeOutputAction(Action);
 public:
 	Writer(string, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*);
 	~Writer();

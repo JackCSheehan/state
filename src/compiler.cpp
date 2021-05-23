@@ -9,9 +9,11 @@ Compiler::Compiler(string p) {
 	attatchAction = false;
 
 	// Create regex objects for searching
-	inputRegex = regex(INPUT_TYPE INPUT_VALUE);
+	fileRegex = regex(FILE_TYPE GENERAL_ACTION);
+	inputRegex = regex(INPUT_TYPE GENERAL_ACTION);
 	stateRegex = regex(STATE_TYPE STATE_VALUE);
-	outputActionRegex = regex("(" PRINT "|" WRITE ")" ACTION_ARG);
+	writeRegex = regex(WRITE GENERAL_ACTION);
+	printRegex = regex(PRINT CONSOLE_ACTION);
 }
 
 // Closes source
@@ -55,20 +57,40 @@ void Compiler::split(string str, char delim, vector<string> &vect) {
 	vect.push_back(currentSplit);
 }
 
-// Parses input definition from given line
-void Compiler::parseInput(string line) {
+// Parses input actions (e.g. FILE and INPUT statements which have 3 parts: type, name, arg)
+void Compiler::parseInputAction(string line) {
+	string trimmedLine = trim(line);
+
 	// Will hold regex matches
 	smatch matches;
 
+	// Points to which regex to be used to parse this line
+	regex* parsingRegex;
+
+	// Points to which map to fill with parsed data
+	map<string, string>* targetMap;
+
+	// Determine which regex to use based on which type of statement this is
+	if (trimmedLine.rfind(INPUT_TYPE, 0) != string::npos) {
+		parsingRegex = &inputRegex;
+		targetMap = &inputs;
+	} 
+	else if (trimmedLine.rfind(FILE_TYPE, 0) != string::npos){
+		parsingRegex = &fileRegex;
+		targetMap = &files;
+	} else {
+		Error::malformedAction(lineCount);
+	}
+
 	// Search line with regex
-	if (!regex_search(line, matches, inputRegex)) return;
+	if (!regex_search(trimmedLine, matches, *parsingRegex)) return;
 
-	// Parse input name and the input string from the regex
-	string inputName = matches.str(1);
-	string inputString = matches.str(2);
+	// Parse action name and the action arg from the regex
+	string actionName = matches.str(1);
+	string actionArg = matches.str(2);
 
-	// Adds parsed input data to inputs map
-	inputs[inputName] = inputString;
+	// Adds parsed data to target map
+	targetMap->operator[](actionName) = actionArg;
 }
 
 // Parses state definition from given line
@@ -133,14 +155,35 @@ void Compiler::parseOutputAction(string line) {
 		Error::unknownOutputAction(lineCount);
 	}
 
-	// Holds parsed parts of action statement
-	smatch actionParts;
+	// Action that will contain parsed output action data
+	Action action;
 
-	// Search line with regex. Throws error if it does not match
-	if (!regex_search(line, actionParts, outputActionRegex)) Error::malformedAction(lineCount);
+	// If this action is a PRINT statement
+	if (trimmedLine.rfind(PRINT, 0) != string::npos) {
+		// Holds parsed parts of PRINT statement
+		smatch printParts;
 
-	// Create action container for action being parsed
-	Action action(actionParts.str(1), actionParts.str(2));
+		// Search line with regex. Throws error if it does not match
+		if (!regex_search(trimmedLine, printParts, printRegex)) Error::malformedAction(lineCount);
+
+		// Create action container for PRINT action being parsed
+		action = Action(PRINT, printParts.str(1));
+
+	// If this action is a WRITE statement
+	} else  if (trimmedLine.rfind(PRINT, 0) != string::npos) {
+		// Holds parsed parts of WRITE statement
+		smatch writeParts;
+
+		// Search line with regex. Throws error if it does not match
+		if (!regex_search(trimmedLine, writeParts, writeRegex)) Error::malformedAction(lineCount);
+
+		// Create action container for PRINT action being parsed
+		action = Action(WRITE, writeParts.str(1), writeParts.str(2));
+	
+	// If this statement is not a valid output action
+	} else  {
+		Error::unknownOutputAction(lineCount);
+	}
 
 	// Add current action to the most recently parsed state
 	outputActions[mostRecentState].push_back(action);
@@ -169,7 +212,7 @@ void Compiler::parse() {
 		}	
 
 		// Check what the line is doing. Call appropriate function to parse it
-		if (line.find(INPUT_TYPE) != string::npos) parseInput(line);
+		if (line.find(INPUT_TYPE) != string::npos || line.find(FILE_TYPE) != string::npos) parseInputAction(line);
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
 		else if (attatchAction) parseOutputAction(line);
 
