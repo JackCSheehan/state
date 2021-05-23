@@ -170,7 +170,7 @@ void Compiler::parseOutputAction(string line) {
 		action = Action(PRINT, printParts.str(1));
 
 	// If this action is a WRITE statement
-	} else  if (trimmedLine.rfind(PRINT, 0) != string::npos) {
+	} else  if (trimmedLine.rfind(WRITE, 0) != string::npos) {
 		// Holds parsed parts of WRITE statement
 		smatch writeParts;
 
