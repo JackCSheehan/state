@@ -85,7 +85,6 @@ void Writer::writeLogic() {
 
 			// Close if statement
 			f << "\t\t\t}\n";
-
 		}
 
 		f << "\t\t\tbreak;\n";
@@ -100,7 +99,7 @@ void Writer::writeOutputAction(Action action) {
 	static const int IN_LEN = string(IN_MARKER).size();
 
 	// Get position of first occurrence of the IN marker
-	size_t inPos = action.arg.find(IN);
+	size_t inPos = action.arg.find(IN_MARKER);
 
 	// Vector of positions in line where the in marker is used
 	vector<size_t> inReferences;
@@ -111,19 +110,19 @@ void Writer::writeOutputAction(Action action) {
 		inReferences.push_back(inPos);
 
 		// Find next reference to the in marker
-		inPos = action.arg.substr(inPos).find(IN);
+		inPos = action.arg.substr(inPos + IN_LEN).find(IN_MARKER);
 	}
 
 	// Replace each reference to in with the name of the in variable
 	for (int pos : inReferences) {
-		action.arg.replace(pos, IN_LEN, "\" << \"" IN " << \"");
+		action.arg.replace(pos, IN_LEN, "\" << " IN " << \"");
 	}
 
 	// Write statement depending on which output action this line has
 	if (action.name == PRINT) {
-		f << "cout << \"" << action.arg << "\";\n";
+		f << "cout << \"" << action.arg << "\";";
 	} else {
-		f << action.identifier << " << \"" << action.arg << "\";\n";
+		f << action.identifier << " << \"" << action.arg << "\";";
 	}
 }
 

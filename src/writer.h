@@ -15,6 +15,7 @@ using namespace std;
 class Writer {
 private:
 	ofstream f;									// Ofstream to write to compiled file
+	map<string, string>* files;					// Pointer to files parsed from source
 	map<string, string>* inputs;				// Pointer to inputs parsed from source
 	map<string, map<string, string>>* states;	// Pointer to states parsed from source
 	map<string, vector<Action>>* outputActions;	// Pointer to output actions parsed from source

@@ -16,6 +16,8 @@ namespace Error {
 	void unknownOutputAction(int);
 	void incorrectlyPlacedInputAction(int);
 	void malformedAction(int);
+	void noInputs();
+	void noStates();
 }
 
 #endif
