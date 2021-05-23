@@ -227,4 +227,13 @@ void Compiler::parse() {
 
 		++lineCount;
 	}
+
+	// Check if any required data is not included
+	if (inputs.size() == 0) {
+		Error::noInputs();
+	}
+
+	if (states.size() == 0) {
+		Error::noStates();
+	}
 }
