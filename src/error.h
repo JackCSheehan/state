@@ -1,6 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#define ERROR_MESSAGE "[ERROR]"
+
 #include <iostream>
 #include <string>
 #include <cstdio>
@@ -18,6 +20,8 @@ namespace Error {
 	void malformedAction(int);
 	void noInputs();
 	void noStates();
+	void invalidIdentifier(int, string);
+	void fileNotFound(int, string);
 }
 
 #endif

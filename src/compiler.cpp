@@ -57,6 +57,12 @@ void Compiler::split(string str, char delim, vector<string> &vect) {
 	vect.push_back(currentSplit);
 }
 
+// Returns true if the given identifier is valid
+bool Compiler::isValidIdentifier(string id) {
+	if (regex_match(id, regex(VALID_IDENTIFIER))) return true;
+	return false;
+}
+
 // Parses input actions (e.g. FILE and INPUT statements which have 3 parts: type, name, arg)
 void Compiler::parseInputAction(string line) {
 	string trimmedLine = trim(line);
@@ -70,6 +76,9 @@ void Compiler::parseInputAction(string line) {
 	// Points to which map to fill with parsed data
 	map<string, string>* targetMap;
 
+	// Flag to track whether line contains file declaration
+	bool isFile = false;
+
 	// Determine which regex to use based on which type of statement this is
 	if (trimmedLine.rfind(INPUT_TYPE, 0) != string::npos) {
 		parsingRegex = &inputRegex;
@@ -78,6 +87,7 @@ void Compiler::parseInputAction(string line) {
 	else if (trimmedLine.rfind(FILE_TYPE, 0) != string::npos){
 		parsingRegex = &fileRegex;
 		targetMap = &files;
+		isFile = true;
 	} else {
 		Error::malformedAction(lineCount);
 	}
@@ -88,6 +98,11 @@ void Compiler::parseInputAction(string line) {
 	// Parse action name and the action arg from the regex
 	string actionName = matches.str(1);
 	string actionArg = matches.str(2);
+
+	// Check that action name is a valid identifier
+	if (!isValidIdentifier(actionName)) Error::invalidIdentifier(lineCount, actionName);
+
+	//if (isFile && !exists(actionArg)) Error::fileNotFound(lineCount, actionArg);
 
 	// Adds parsed data to target map
 	targetMap->operator[](actionName) = actionArg;
@@ -103,6 +118,9 @@ void Compiler::parseState(string line) {
 
 	// Parse input name, raw transition mapping string, and actions
 	string stateName = matches.str(1);
+
+	// Check that state name is a valid identifier
+	if (!isValidIdentifier(stateName)) Error::invalidIdentifier(lineCount, stateName);
 
 	mostRecentState = stateName;
 
@@ -191,7 +209,7 @@ void Compiler::parseOutputAction(string line) {
 
 // Compile parsed data to a compiled file
 void Compiler::compile() {
-	Writer w(compiledName, &inputs, &states, &outputActions);
+	Writer w(compiledName, &files, &inputs, &states, &outputActions);
 	w.write();
 }
 

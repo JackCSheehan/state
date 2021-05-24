@@ -23,11 +23,13 @@ private:
 	void writeIncludes();
 	void declareAlphabet();
 	void declareStates();
+	void writeFileDeclarations();
 	void writeLogic();
-
 	void writeOutputAction(Action);
+	void writeFileCloses();
+	void writeMainClose();
 public:
-	Writer(string, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*);
+	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*);
 	~Writer();
 
 	void write();
