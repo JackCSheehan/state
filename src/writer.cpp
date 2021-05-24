@@ -1,30 +1,32 @@
 #include "writer.h"
 
 // Takes path to target file and pointers to parsed data
-Writer::Writer(string p, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* a) {
-	f.open(p);
+Writer::Writer(string p, map<string, string>* f, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* a) {
+	this->f.open(p);
+	files = f;
 	inputs = i;
 	states = s;
 	outputActions = a;
 }
 
-// Closes file writer
+// Closes file writer 
 Writer::~Writer() {
 	f.close();
 }
 
 // Writes imports needed in compiled code
 void Writer::writeIncludes() {
-	f << "#include<cstdio>\n"
-	  << "#include<string>\n"
-	  << "using namespace std;\n";
+	f << "#include<iostream>\n"
+	   	 "#include<fstream>\n"
+	     "#include<string>\n"
+	     "using namespace std;\n";
 }
 
 // Declares enum for states in target file
 void Writer::declareStates() {
 	// Write enum for state
 	f << "enum State {\n";
-	for (auto& state : *states) {
+	for (pair<string, map<string, string>> state : *states) {
 		f << "\t" << state.first << ",\n";
 	}
 
@@ -34,13 +36,25 @@ void Writer::declareStates() {
 	f << "};\n";
 }
 
+// Writes declarations of files declared by user
+void Writer::writeFileDeclarations() {
+	// Iterate through files and write each one as an f stream
+	for (pair<string, string> file : *files) {
+		// Declare current file as fstream object
+		f << "\tfstream " << file.first << "(\"" << file.second << "\", fstream::in | fstream::out);\n";
+	}
+}
+
 // Writes main function and state change logic
 void Writer::writeLogic() {
 	// Write beginning of main function
 	f << "int main() {\n";
 
+	// Write declaration of file objects
+	writeFileDeclarations();
+
 	// Declare input variable, starting state, while loop opening, and switch head
-	f << "\tchar in[" << INPUT_SIZE << "];\n"
+	f << "\tchar " IN " [" << INPUT_SIZE << "];\n"
 	  << "\tState state = " << states->begin()->first << ";\n"
 	  << "\twhile(state != " << END_STATE << ") {\n"
 	  << "\t\tswitch(state) {\n";
@@ -49,13 +63,13 @@ void Writer::writeLogic() {
 	bool writeIf;
 
 	// Write case for each state
-	for (auto& state : *states) {
+	for (pair<string, map<string, string>> state : *states) {
 		f << "\t\tcase " << state.first << ":\n";
 
 		writeIf = true;
 
 		// Write if/else for each transition to change state
-		for (auto& trans : state.second) {
+		for (pair<string, string> trans : state.second) {
 			// Write if/else if branch
 			if (writeIf) {
 				f << "\t\t\tif(";
@@ -65,7 +79,7 @@ void Writer::writeLogic() {
 			}
 
 			// Write condition to determine which input is currently being analyzed
-			f << "in == \"" << inputs->operator[](trans.first) << "\") {\n";
+			f << IN " == \"" << inputs->operator[](trans.first) << "\") {\n";
 			
 			// Write state transition logic
 			f << "\t\t\t\tstate = "<< trans.second << ";\n";
@@ -89,8 +103,11 @@ void Writer::writeLogic() {
 
 		f << "\t\t\tbreak;\n";
 	}
-	// Close switch, while loop, and main
-	f << "\t\t}\n\t}\n\treturn 0;\n}";
+	// Close switch and while loop
+	f << "\t\t}\n\t}\n";
+
+	// Close files
+	writeFileCloses();
 }
 
 // Writes the given output action with given args
@@ -126,10 +143,24 @@ void Writer::writeOutputAction(Action action) {
 	}
 }
 
+// Writes closing statements for ifstream
+void Writer::writeFileCloses() {
+	// Iterate through files and write closes for each one
+	for (pair<string, string> file : *files) {
+		// Declare current file as fstream object
+		f << "\t" << file.first << ".close();\n";
+	}
+}
+
+// Writes closing for main function
+void Writer::writeMainClose() {
+	f << "\treturn 0;\n}";
+}
 
 // Function to drive helper functions to compile to target language
 void Writer::write() {
 	writeIncludes();
 	declareStates();
 	writeLogic();
+	writeMainClose();
 }

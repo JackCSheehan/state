@@ -29,6 +29,7 @@
 #define GENERAL_ACTION "\\s+(\\w*)\\s+\"(.*?)\""	// Regex for parsing general 3-part actions
 #define STATE_VALUE "\\s+(\\w*)\\s+\\[(.*?)\\]"		// Regex for parsing the names and transitions of states
 #define CONSOLE_ACTION	"\\s*\"(.*)\""				// Regex for parsing PRINT and SCAN actions
+#define VALID_IDENTIFIER "^[a-zA-Z_]\\w*$"			// Regex for checking for a valid identifier name
 
 #include <cstdio>
 #include <cctype>
@@ -67,6 +68,8 @@ private:
 
 	static string trim(string);
 	static void split(string, char, vector<string>&);
+	static bool isValidIdentifier(string);
+	static bool exists(string);
 
 	void parseInputAction(string);
 	void parseState(string);
