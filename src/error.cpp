@@ -26,6 +26,11 @@ namespace Error {
 		exit(1);
 	}
 
+	void unknownInputAction(int line) {
+		cerr << ERROR_MESSAGE " Unknown input action on line " << line << "\n";
+		exit(1);
+	}
+
 	// Error thrown if input action are placed in state blocks
 	void incorrectlyPlacedInputAction(int line) {
 		cerr << ERROR_MESSAGE " Incorrectly place input action on line " << line << ". Cannot place input actions in state blocks\n";
@@ -59,6 +64,18 @@ namespace Error {
 	// Error thrown if a file does not exist
 	void fileNotFound(int line, string path) {
 		cerr << ERROR_MESSAGE " File " << path << " declared at line " << line << " does not exist\n";
+		exit(1);
+	}
+
+	// Error thrown if a user tries to define more than one input action
+	void multipleInputActions(int line) {
+		cerr << ERROR_MESSAGE " Only one input action is allowed per finite-state machine. A second input action was defined on line " << line << "\n";
+		exit(1);
+	}
+
+	// Error thrown if given input delimiter 
+	void invalidDelimiter(int line, string delim) {
+		cerr << ERROR_MESSAGE << " Invalid delimiter '" << delim << "' at line " << line << ". Delimiters must not be more than one character";
 		exit(1);
 	}
 }

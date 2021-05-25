@@ -54,15 +54,19 @@ private:
 	map<string, string> files;					// Maps file names to file  paths
 	map<string, string> inputs;					// Maps input name to input string
 	map<string, map<string, string>> states;	// Maps states to transitions: state names -> (input -> another state name)
+	Action inputAction;							// Holds action object representing input action
 	map<string, vector<Action>> outputActions;	// Maps state name to a list of output actions
 
 	int lineCount;								// Current line being parsed by compiler
 	bool attatchAction;							// Flag to track if actions are being parsed
+	bool inputActionParsed;						// Flag to track if an input action has already been parsed
 	string mostRecentState;						// The most recent state parsed from source
 
-	regex fileRegex;							// Regex to parse files
-	regex inputRegex;							// Regex to parse input
-	regex stateRegex;							// Regex to parse state
+	regex fileRegex;							// Regex to parse file declarations
+	regex inputRegex;							// Regex to parse input declarations
+	regex stateRegex;							// Regex to parse state declarations
+	regex scanRegex;							// Regex to parse SCAN actions
+	regex readRegex;							// Regex to parse READ actions
 	regex writeRegex;							// Regex to parse WRITE statements
 	regex printRegex;							// Regex to parse PRINT statements
 
@@ -71,8 +75,11 @@ private:
 	static bool isValidIdentifier(string);
 	static bool exists(string);
 
-	void parseInputAction(string);
+	string strDelimToChar(string);
+
+	void parseInputAndFileDeclarations(string);
 	void parseState(string);
+	void parseInputAction(string);
 	void parseOutputAction(string);
 
 public:

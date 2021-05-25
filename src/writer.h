@@ -19,17 +19,19 @@ private:
 	map<string, string>* inputs;				// Pointer to inputs parsed from source
 	map<string, map<string, string>>* states;	// Pointer to states parsed from source
 	map<string, vector<Action>>* outputActions;	// Pointer to output actions parsed from source
+	Action* inputAction;						// Pointer to input actions
 
 	void writeIncludes();
 	void declareAlphabet();
 	void declareStates();
 	void writeFileDeclarations();
 	void writeLogic();
+	void writeInputAction();
 	void writeOutputAction(Action);
 	void writeFileCloses();
 	void writeMainClose();
 public:
-	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*);
+	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*, Action*);
 	~Writer();
 
 	void write();

@@ -7,11 +7,14 @@ Compiler::Compiler(string p) {
 	compiledName = p.substr(0, p.find_last_of(".")) + ".cpp";
 	lineCount = 1;
 	attatchAction = false;
+	inputActionParsed = false;
 
 	// Create regex objects for searching
 	fileRegex = regex(FILE_TYPE GENERAL_ACTION);
 	inputRegex = regex(INPUT_TYPE GENERAL_ACTION);
 	stateRegex = regex(STATE_TYPE STATE_VALUE);
+	scanRegex = regex(SCAN CONSOLE_ACTION);
+	readRegex = regex(READ GENERAL_ACTION);
 	writeRegex = regex(WRITE GENERAL_ACTION);
 	printRegex = regex(PRINT CONSOLE_ACTION);
 }
@@ -59,12 +62,48 @@ void Compiler::split(string str, char delim, vector<string> &vect) {
 
 // Returns true if the given identifier is valid
 bool Compiler::isValidIdentifier(string id) {
-	if (regex_match(id, regex(VALID_IDENTIFIER))) return true;
+	// Check if id is valid and doesn't clash with certain reserved words
+	if (regex_match(id, regex(VALID_IDENTIFIER)) &&
+		id != IN &&
+		id != END_STATE &&
+		id != INPUT_TYPE &&
+		id != STATE_TYPE &&
+		id != FILE_TYPE &&
+		id != PRINT &&
+		id != WRITE &&
+		id != SCAN &&
+		id != READ) {
+		return true;
+	}
 	return false;
 }
 
-// Parses input actions (e.g. FILE and INPUT statements which have 3 parts: type, name, arg)
-void Compiler::parseInputAction(string line) {
+// Returns whether or not the file at the given path exists
+bool Compiler::exists(string path) {
+	ifstream file(path);
+	return !file.good();
+}
+
+// Takes the given string representing a delimiter and returns the first char delimiter it parses from it as a string
+string Compiler::strDelimToChar(string delim) {
+	string trimmedDelim = trim(delim);
+	string parsedDelim;
+
+	// If no delim give, throw error
+	if (trimmedDelim.empty()) Error::invalidDelimiter(lineCount, trimmedDelim);
+	if (trimmedDelim.substr(0, 1) == "\\") {
+		// Use either en escaped backslash or escape character depending on length of delim
+		if (trimmedDelim.length() < 2) parsedDelim = "\\\\";
+		else parsedDelim = "\\" + string(1, trimmedDelim[1]);
+	} else {
+		parsedDelim = trimmedDelim[0];
+	}
+
+	return parsedDelim;
+}
+
+// Parses input and file declarations since they are so similarly formed
+void Compiler::parseInputAndFileDeclarations(string line) {
 	string trimmedLine = trim(line);
 
 	// Will hold regex matches
@@ -102,7 +141,7 @@ void Compiler::parseInputAction(string line) {
 	// Check that action name is a valid identifier
 	if (!isValidIdentifier(actionName)) Error::invalidIdentifier(lineCount, actionName);
 
-	//if (isFile && !exists(actionArg)) Error::fileNotFound(lineCount, actionArg);
+	if (isFile && !exists(actionArg)) Error::fileNotFound(lineCount, actionArg);
 
 	// Adds parsed data to target map
 	targetMap->operator[](actionName) = actionArg;
@@ -154,18 +193,52 @@ void Compiler::parseState(string line) {
 	states[stateName] = transitionMap;
 }
 
+// Parsed input actions such as SCAN and READ
+void Compiler::parseInputAction(string line) {
+	string trimmedLine = trim(line);
+
+	// Check for duplicate input actions
+	if (inputActionParsed) Error::multipleInputActions(lineCount);
+
+	// Action that will contain parsed input action data
+	Action action;
+
+	// If this action is a SCAN statement
+	if (trimmedLine.rfind(SCAN, 0) != string::npos) {
+		// Holds parsed parts of SCAN statement
+		smatch scanParts;
+
+		// Search line with regex. Throws error if it does not match
+		if (!regex_search(trimmedLine, scanParts, scanRegex)) Error::malformedAction(lineCount);
+
+		// Create action container for SCAN action being parsed
+		action = Action(SCAN, scanParts.str(1));
+
+	// If the action is a READ statement
+	} else if (trimmedLine.rfind(READ, 0) != string::npos) {
+		smatch readParts;
+
+		// Search line with regex. Throws error if it does not match
+		if (!regex_search(trimmedLine, readParts, readRegex)) Error::malformedAction(lineCount);
+
+		// Create action container for READ action being parsed
+		action = Action(READ, readParts.str(1), strDelimToChar(readParts.str(2)));
+	
+	// If this statement is not a valid input action
+	} else  {
+		Error::unknownInputAction(lineCount);
+	}
+
+	inputAction = action;
+	inputActionParsed = true;
+}
+
 // Parses built-in output actions
 void Compiler::parseOutputAction(string line) {
 	string trimmedLine = trim(line);
 
 	// If line is only brace, do not try to parse
 	if (trimmedLine == BLOCK_START || trimmedLine == BLOCK_END) return;
-
-	// Throw error if line starts with input actions
-	if (trimmedLine.rfind(SCAN, 0) != string::npos ||
-		trimmedLine.rfind(READ, 0) !=  string::npos) {
-		Error::incorrectlyPlacedInputAction(lineCount);
-	}
 
 	// Throw error if line does not start with any built-in output actions
 	if (trimmedLine.rfind(PRINT, 0) == string::npos &&
@@ -209,7 +282,7 @@ void Compiler::parseOutputAction(string line) {
 
 // Compile parsed data to a compiled file
 void Compiler::compile() {
-	Writer w(compiledName, &files, &inputs, &states, &outputActions);
+	Writer w(compiledName, &files, &inputs, &states, &outputActions, &inputAction);
 	w.write();
 }
 
@@ -230,8 +303,9 @@ void Compiler::parse() {
 		}	
 
 		// Check what the line is doing. Call appropriate function to parse it
-		if (line.find(INPUT_TYPE) != string::npos || line.find(FILE_TYPE) != string::npos) parseInputAction(line);
+		if (line.find(INPUT_TYPE) != string::npos || line.find(FILE_TYPE) != string::npos) parseInputAndFileDeclarations(line);
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
+		else if (line.find(SCAN) != string::npos || line.find(READ) != string::npos) parseInputAction(line);
 		else if (attatchAction) parseOutputAction(line);
 
 		// Check if current line has a closing block character
