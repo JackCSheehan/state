@@ -1,12 +1,13 @@
 #include "writer.h"
 
 // Takes path to target file and pointers to parsed data
-Writer::Writer(string p, map<string, string>* f, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* a) {
+Writer::Writer(string p, map<string, string>* f, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* oa, Action* ia) {
 	this->f.open(p);
 	files = f;
 	inputs = i;
 	states = s;
-	outputActions = a;
+	outputActions = oa;
+	inputAction = ia;
 }
 
 // Closes file writer 
@@ -53,11 +54,15 @@ void Writer::writeLogic() {
 	// Write declaration of file objects
 	writeFileDeclarations();
 
-	// Declare input variable, starting state, while loop opening, and switch head
-	f << "\tchar " IN " [" << INPUT_SIZE << "];\n"
+	// Declare input variable, starting state, while loop opening, and input action
+	f << "\tstring " IN ";\n"
 	  << "\tState state = " << states->begin()->first << ";\n"
-	  << "\twhile(state != " << END_STATE << ") {\n"
-	  << "\t\tswitch(state) {\n";
+	  << "\twhile(state != " << END_STATE " && ";
+	 writeInputAction();
+
+	f << ") { \n";
+
+	f << "\t\tswitch(state) {\n";
 
 	// Flag to determine if "if" should be written
 	bool writeIf;
@@ -110,7 +115,25 @@ void Writer::writeLogic() {
 	writeFileCloses();
 }
 
-// Writes the given output action with given args
+// Writes the given input action
+void Writer::writeInputAction() {
+	// String representation of where data should be input from
+	string location;
+
+	// If SCAN, read from cin
+	if (inputAction->name == SCAN) {
+		location = "cin";
+
+	// If READ, read from given file
+	} else {
+		location = inputAction->identifier;
+	}
+
+	// Write input
+	f << "getline(" << location << ", " IN ", '" << inputAction->arg << "')";
+}
+
+// Writes the given output action
 void Writer::writeOutputAction(Action action) {
 	// Get size of IN variable name
 	static const int IN_LEN = string(IN_MARKER).size();
