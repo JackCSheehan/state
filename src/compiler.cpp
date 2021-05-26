@@ -26,23 +26,33 @@ Compiler::~Compiler() {
 
 // Trims whitespace from either end of given string
 string Compiler::trim(string str) {
+	// Base case; check for empty strings
+	if (str.empty()) return "";
+
 	// Indexes of string with starting and ending whitespace omitted
 	int start = 0;
-	int end = str.size() - 1;
+	int end = str.length() - 1;
+	int len;
 
 	// Find start of non-whitespace
-	while (start < str.size() && isspace(str.at(start))) ++start;
+	while (start < str.length() && isspace(str.at(start))) ++start;
 
 	// Find end of non-whitespace
 	while (end > 0 && isspace(str.at(end))) --end;
 
-	return str.substr(start, end + 1);
+	// Calculate length of trimmed string
+	len = (end + 1) - start;
+
+	return str.substr(start, len);
 }
 
 // Splits given str at given delim. Puts split strings into given string vector
 void Compiler::split(string str, char delim, vector<string> &vect) {
 	// Current split being created
 	string currentSplit = "";
+
+	// Clear vector before pushing to it
+	vect.clear();
 
 	// Iterate through each char in given str
 	for (char const &c : str) {
@@ -158,8 +168,6 @@ void Compiler::parseState(string line) {
 	if (stateName == END_STATE) Error::endStateClash(lineCount);
 
 	string rawTransitionMap = matches.str(2);
-	
-	int transitionMapSplitSize = count(rawTransitionMap.begin(), rawTransitionMap.end(), TRANSITION_SEPARATOR) + 1;
 
 	// Create string vector to hold split transition map
 	vector<string> transitionMapSplit;
@@ -174,9 +182,14 @@ void Compiler::parseState(string line) {
 	vector<string> transition;
 
 	// Parse transition mappings from raw transition map
-	for (int i = 0; i < transitionMapSplitSize; ++i) {
+	for (int i = 0; i < transitionMapSplit.size(); ++i) {
 		// Parse transition and add it to the map
 		split(transitionMapSplit[i], MAPPING_SEPARATOR, transition);
+
+		// Don't add this transition if it transitions to current state
+		if (stateName == trim(transition[1])) continue;
+
+		// Add transition to map if it hasn't already been added
 		transitionMap[trim(transition[0])] = trim(transition[1]);
 	}
 
