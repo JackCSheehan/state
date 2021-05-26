@@ -1,13 +1,14 @@
 #include "writer.h"
 
 // Takes path to target file and pointers to parsed data
-Writer::Writer(string p, map<string, string>* f, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* oa, Action* ia) {
+Writer::Writer(string p, map<string, string>* f, map<string, string>* i, map<string, map<string, string>>* s, map<string, vector<Action>>* oa, Action* ia, string fs) {
 	this->f.open(p);
 	files = f;
 	inputs = i;
 	states = s;
 	outputActions = oa;
 	inputAction = ia;
+	firstState = fs;
 }
 
 // Closes file writer 
@@ -48,26 +49,22 @@ void Writer::writeFileDeclarations() {
 
 // Writes main function and state change logic
 void Writer::writeLogic() {
-	// Write beginning of main function
-	f << "int main() {\n";
+	// Write beginning of main function and IN declaration
+	f << "int main() {\n"
+		 "\tstring " IN ";\n";
 
 	// Write declaration of file objects
 	writeFileDeclarations();
 
-	// Declare input variable, starting state, while loop opening, and input action
-	f << "\tstring " IN ";\n"
-	  << "\tState state = " << states->begin()->first << ";\n"
-	  << "\twhile(state != " << END_STATE " && ";
-	 writeInputAction();
-
-	f << ") { \n";
-
-	f << "\t\tswitch(state) {\n";
+	// Declare input variable, do-while loop opening and first switch statement
+	f  << "\tState " STATE " = " << firstState << ";\n"
+	 	  "\tdo { \n"
+		  "\t\tswitch" "(" STATE ") {\n";
 
 	// Flag to determine if "if" should be written
 	bool writeIf;
 
-	// Write case for each state
+	// Write case for each state to switch states
 	for (pair<string, map<string, string>> state : *states) {
 		f << "\t\tcase " << state.first << ":\n";
 
@@ -87,20 +84,7 @@ void Writer::writeLogic() {
 			f << IN " == \"" << inputs->operator[](trans.first) << "\") {\n";
 			
 			// Write state transition logic
-			f << "\t\t\t\tstate = "<< trans.second << ";\n";
-
-			// Get output actions associated with this state
-			vector<Action> currentActions = outputActions->operator[](state.first);
-
-			// Iterate through actions and write them
-			for (Action a : currentActions) {
-				// Write tab to properly indent this action
-				f << "\t\t\t\t";
-
-				writeOutputAction(a);
-
-				f << "\n";
-			}
+			f << "\t\t\t\t" STATE " = "<< trans.second << ";\n";
 
 			// Close if statement
 			f << "\t\t\t}\n";
@@ -108,8 +92,43 @@ void Writer::writeLogic() {
 
 		f << "\t\t\tbreak;\n";
 	}
-	// Close switch and while loop
-	f << "\t\t}\n\t}\n";
+	// Close switch
+	f << "\t\t}\n";
+
+	// Write second switch statement to execute actions
+	f << "\t\tswitch(" STATE ") {\n";
+
+	// Actions currently being written at any point in the action-writing loop
+	vector<Action> currentActions;
+
+	// Write case for each state to write actions
+	for (pair<string, map<string, string>> state : *states) {
+		f << "\t\tcase " << state.first << ":\n";
+
+		// Get output actions associated with this state
+		currentActions = outputActions->operator[](state.first);
+
+		// Iterate through actions and write them
+		for (Action a : currentActions) {
+			// Write tab to properly indent this action
+			f << "\t\t\t";
+
+			writeOutputAction(a);
+
+			f << "\n";
+		}
+
+		f << "\t\t\tbreak;\n";
+	}
+
+	// Close second switch block
+	f << "\t\t}\n";
+
+	// Write do-while condition
+	f << "\t} while(state != " << END_STATE " && ";
+	writeInputAction();
+
+	f << ");\n";
 
 	// Close files
 	writeFileCloses();

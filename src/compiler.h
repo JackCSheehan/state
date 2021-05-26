@@ -13,6 +13,7 @@
 #define BLOCK_END "}"
 #define END_STATE "END"
 #define IN "IN"
+#define STATE "state"
 #define IN_MARKER "$in"
 #define COMMENT "//"
 
@@ -28,7 +29,7 @@
 
 // Regex strings
 #define GENERAL_ACTION "\\s+(\\w*)\\s+\"(.*?)\""	// Regex for parsing general 3-part actions
-#define STATE_VALUE "\\s+(\\w*)\\s+\\[(.*?)\\]"		// Regex for parsing the names and transitions of states
+#define STATE_VALUE "\\s+(\\w*)\\s*\\[(.*?)\\]"		// Regex for parsing the names and transitions of states
 #define CONSOLE_ACTION	"\\s*\"(.*)\""				// Regex for parsing PRINT and SCAN actions
 #define VALID_IDENTIFIER "^[a-zA-Z_]\\w*$"			// Regex for checking for a valid identifier name
 
@@ -62,6 +63,7 @@ private:
 	bool attatchAction;							// Flag to track if actions are being parsed
 	bool inputActionParsed;						// Flag to track if an input action has already been parsed
 	string mostRecentState;						// The most recent state parsed from source
+	string firstState;							// The first state parsed from source
 
 	regex fileRegex;							// Regex to parse file declarations
 	regex inputRegex;							// Regex to parse input declarations

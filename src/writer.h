@@ -20,6 +20,7 @@ private:
 	map<string, map<string, string>>* states;	// Pointer to states parsed from source
 	map<string, vector<Action>>* outputActions;	// Pointer to output actions parsed from source
 	Action* inputAction;						// Pointer to input actions
+	string firstState;							// Name of first state parsed
 
 	void writeIncludes();
 	void declareAlphabet();
@@ -31,7 +32,7 @@ private:
 	void writeFileCloses();
 	void writeMainClose();
 public:
-	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*, Action*);
+	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*, Action*, string);
 	~Writer();
 
 	void write();
