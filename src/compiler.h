@@ -14,6 +14,7 @@
 #define END_STATE "END"
 #define IN "IN"
 #define IN_MARKER "$in"
+#define COMMENT "//"
 
 // Output actions
 #define PRINT "PRINT"
