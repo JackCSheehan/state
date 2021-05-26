@@ -151,6 +151,9 @@ void Compiler::parseState(string line) {
 
 	mostRecentState = stateName;
 
+	// If first state hasn't been assigned yet, assign in
+	if (firstState.empty()) firstState = stateName;
+
 	// Throw error if user tries to define their own end state
 	if (stateName == END_STATE) Error::endStateClash(lineCount);
 
@@ -270,7 +273,7 @@ void Compiler::parseOutputAction(string line) {
 
 // Compile parsed data to a compiled file
 void Compiler::compile() {
-	Writer w(compiledName, &files, &inputs, &states, &outputActions, &inputAction);
+	Writer w(compiledName, &files, &inputs, &states, &outputActions, &inputAction, firstState);
 	w.write();
 }
 
