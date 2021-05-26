@@ -78,12 +78,6 @@ bool Compiler::isValidIdentifier(string id) {
 	return false;
 }
 
-// Returns whether or not the file at the given path exists
-bool Compiler::exists(string path) {
-	ifstream file(path);
-	return !file.good();
-}
-
 // Takes the given string representing a delimiter and returns the first char delimiter it parses from it as a string
 string Compiler::strDelimToChar(string delim) {
 	string trimmedDelim = trim(delim);
@@ -115,9 +109,6 @@ void Compiler::parseInputAndFileDeclarations(string line) {
 	// Points to which map to fill with parsed data
 	map<string, string>* targetMap;
 
-	// Flag to track whether line contains file declaration
-	bool isFile = false;
-
 	// Determine which regex to use based on which type of statement this is
 	if (trimmedLine.rfind(INPUT_TYPE, 0) != string::npos) {
 		parsingRegex = &inputRegex;
@@ -126,7 +117,6 @@ void Compiler::parseInputAndFileDeclarations(string line) {
 	else if (trimmedLine.rfind(FILE_TYPE, 0) != string::npos){
 		parsingRegex = &fileRegex;
 		targetMap = &files;
-		isFile = true;
 	} else {
 		Error::malformedAction(lineCount);
 	}
@@ -140,8 +130,6 @@ void Compiler::parseInputAndFileDeclarations(string line) {
 
 	// Check that action name is a valid identifier
 	if (!isValidIdentifier(actionName)) Error::invalidIdentifier(lineCount, actionName);
-
-	if (isFile && !exists(actionArg)) Error::fileNotFound(lineCount, actionArg);
 
 	// Adds parsed data to target map
 	targetMap->operator[](actionName) = actionArg;
@@ -303,7 +291,8 @@ void Compiler::parse() {
 		}	
 
 		// Check what the line is doing. Call appropriate function to parse it
-		if (line.find(INPUT_TYPE) != string::npos || line.find(FILE_TYPE) != string::npos) parseInputAndFileDeclarations(line);
+		if (trim(line).rfind(COMMENT, 0) != string::npos);
+		else if (line.find(INPUT_TYPE) != string::npos || line.find(FILE_TYPE) != string::npos) parseInputAndFileDeclarations(line);
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
 		else if (line.find(SCAN) != string::npos || line.find(READ) != string::npos) parseInputAction(line);
 		else if (attatchAction) parseOutputAction(line);
