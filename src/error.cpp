@@ -26,6 +26,7 @@ namespace Error {
 		exit(1);
 	}
 
+	// Error thrown if an input action is unknown
 	void unknownInputAction(int line) {
 		cerr << ERROR_MESSAGE " Unknown input action on line " << line << "\n";
 		exit(1);
@@ -63,7 +64,7 @@ namespace Error {
 
 	// Error thrown if a file does not exist
 	void fileNotFound(int line, string path) {
-		cerr << ERROR_MESSAGE " File " << path << " declared at line " << line << " does not exist\n";
+		cerr << ERROR_MESSAGE " File '" << path << "'' declared at line " << line << " does not exist\n";
 		exit(1);
 	}
 
@@ -75,7 +76,31 @@ namespace Error {
 
 	// Error thrown if given input delimiter 
 	void invalidDelimiter(int line, string delim) {
-		cerr << ERROR_MESSAGE << " Invalid delimiter '" << delim << "' at line " << line << ". Delimiters must not be more than one character";
+		cerr << ERROR_MESSAGE " Invalid delimiter '" << delim << "' at line " << line << ". Delimiters must not be more than one character";
+		exit(1);
+	}
+
+	// Error thrown if user tries to read or write from a file that was not declared
+	void referencingUndeclaredFile(string identifier) {
+		cerr << ERROR_MESSAGE " Attempting file I/O on undeclared file '" << identifier << "'\n";
+		exit(1);
+	}
+
+	// Error thrown if user references undeclared input
+	void referencingUndeclaredInput(string input) {
+		cerr << ERROR_MESSAGE " Referencing undeclared input '" << input << "'\n";
+		exit(1);
+	}
+
+	// Error thrown if user references undeclared state
+	void referencingUndeclaredState(string state) {
+		cerr << ERROR_MESSAGE " Referencing undeclared state '" << state << "'\n";
+		exit(1);
+	}
+
+	// Error thrown if user does not define an input action
+	void noInputActions() {
+		cerr << ERROR_MESSAGE " At least one input action must be defined\n";
 		exit(1);
 	}
 }
