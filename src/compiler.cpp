@@ -290,6 +290,44 @@ void Compiler::compile() {
 	w.write();
 }
 
+// Checks parsed data for errors
+void Compiler::checkForParseErrors() {
+	// Check if any required data is not included
+	if (inputs.size() == 0) Error::noInputs();
+
+	if (states.size() == 0) Error::noStates();
+
+	// Check if there is no input action
+	if (inputAction.name.empty()) Error::noInputActions();
+
+	// If input action is WRITE and the file name hasn't been declared, throw error
+	if (inputAction.name == READ && !files.count(inputAction.identifier))
+		Error::referencingUndeclaredFile(inputAction.identifier);
+
+	// Check WRITE actions to make sure they reference valid files
+	for (pair<string, vector<Action>> outputAction : outputActions) {
+		// Iterate through output actions and check for WRITEs
+		for (Action a : outputAction.second) {
+			// Throw error if WRITE file wasn't declared
+			if (a.name == WRITE && !files.count(a.identifier))
+				Error::referencingUndeclaredFile(a.identifier);
+		}
+	}
+
+	// Check that all inputs and states referenced in transitions were declared
+	for (pair<string, map<string, string>> state : states) {
+		// Iterate through each transition
+		for (pair<string, string> trans : state.second) {
+			// If transition input does not exist in inputs, throw error
+			if (!inputs.count(trans.first)) Error::referencingUndeclaredInput(trans.first);
+
+			// If transition target state does not exist in states, throw error
+			if (!states.count(trans.second)) Error::referencingUndeclaredState(trans.second);
+		}
+	}
+
+}
+
 // Parses source files
 void Compiler::parse() {
 	// Current line in source
@@ -324,13 +362,5 @@ void Compiler::parse() {
 
 		++lineCount;
 	}
-
-	// Check if any required data is not included
-	if (inputs.size() == 0) {
-		Error::noInputs();
-	}
-
-	if (states.size() == 0) {
-		Error::noStates();
-	}
+	checkForParseErrors();
 }

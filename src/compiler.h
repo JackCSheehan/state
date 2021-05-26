@@ -76,7 +76,6 @@ private:
 	static string trim(string);
 	static void split(string, char, vector<string>&);
 	static bool isValidIdentifier(string);
-	static bool exists(string);
 
 	string strDelimToChar(string);
 
@@ -84,6 +83,7 @@ private:
 	void parseState(string);
 	void parseInputAction(string);
 	void parseOutputAction(string);
+	void checkForParseErrors();
 
 public:
 	Compiler(string);

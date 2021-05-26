@@ -24,6 +24,10 @@ namespace Error {
 	void fileNotFound(int, string);
 	void multipleInputActions(int);
 	void invalidDelimiter(int, string);
+	void referencingUndeclaredFile(string);
+	void referencingUndeclaredInput(string);
+	void referencingUndeclaredState(string);
+	void noInputActions();
 }
 
 #endif
