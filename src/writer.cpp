@@ -135,6 +135,9 @@ void Writer::writeLogic() {
 
 	// Close files
 	writeFileCloses();
+
+	// Write closing for main function
+	f << "\treturn 0;\n}";
 }
 
 // Writes the given input action
@@ -197,15 +200,9 @@ void Writer::writeFileCloses() {
 	}
 }
 
-// Writes closing for main function
-void Writer::writeMainClose() {
-	f << "\treturn 0;\n}";
-}
-
 // Function to drive helper functions to compile to target language
 void Writer::write() {
 	writeIncludes();
 	declareStates();
 	writeLogic();
-	writeMainClose();
 }

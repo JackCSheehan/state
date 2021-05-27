@@ -32,12 +32,6 @@ namespace Error {
 		exit(1);
 	}
 
-	// Error thrown if input action are placed in state blocks
-	void incorrectlyPlacedInputAction(int line) {
-		cerr << ERROR_MESSAGE " Incorrectly place input action on line " << line << ". Cannot place input actions in state blocks\n";
-		exit(1);
-	}
-
 	// Error thrown when actions are missing parts or not correctly formed
 	void malformedAction(int line) {
 		cerr << ERROR_MESSAGE " Malformed action on line " << line << "\n";

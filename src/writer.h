@@ -30,7 +30,6 @@ private:
 	void writeInputAction();
 	void writeOutputAction(Action);
 	void writeFileCloses();
-	void writeMainClose();
 public:
 	Writer(string, map<string, string>*, map<string, string>*, map<string, map<string, string>>*, map<string, vector<Action>>*, Action*, string);
 	~Writer();

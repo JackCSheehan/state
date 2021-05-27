@@ -79,6 +79,7 @@ bool Compiler::isValidIdentifier(string id) {
 	// Check if id is valid and doesn't clash with certain reserved words
 	if (regex_match(id, regex(VALID_IDENTIFIER)) &&
 		id != IN &&
+		id != STATE &&
 		id != END_STATE &&
 		id != INPUT_TYPE &&
 		id != STATE_TYPE &&
@@ -97,7 +98,7 @@ string Compiler::strDelimToChar(string delim) {
 	string trimmedDelim = trim(delim);
 	string parsedDelim;
 
-	// If no delim give, throw error
+	// If no delim given, throw error
 	if (trimmedDelim.empty()) Error::invalidDelimiter(lineCount, trimmedDelim);
 	if (trimmedDelim.substr(0, 1) == "\\") {
 		// Use either en escaped backslash or escape character depending on length of delim
@@ -163,16 +164,17 @@ void Compiler::parseState(string line) {
 	// Check that state name is a valid identifier
 	if (!isValidIdentifier(stateName)) Error::invalidIdentifier(lineCount, stateName);
 
+	// Throw error if user tries to define their own end state
+	if (stateName == END_STATE) Error::endStateClash(lineCount);
+
 	mostRecentState = stateName;
 
 	// If first state hasn't been assigned yet, assign in
 	if (firstState.empty()) firstState = stateName;
 
-	// Throw error if user tries to define their own end state
-	if (stateName == END_STATE) Error::endStateClash(lineCount);
-
 	string rawTransitionMap = matches.str(2);
 
+	// If the transition map is blank, put a blank string mapping in the states map to indicate sink state
 	if (rawTransitionMap.empty()) {
 		map<string, string> blank;
 		blank[""] = "";
@@ -227,7 +229,7 @@ void Compiler::parseInputAction(string line) {
 		if (!regex_search(trimmedLine, scanParts, scanRegex)) Error::malformedAction(lineCount);
 
 		// Create action container for SCAN action being parsed
-		action = Action(SCAN, scanParts.str(1));
+		action = Action(SCAN, strDelimToChar(scanParts.str(1)));
 
 	// If the action is a READ statement
 	} else if (trimmedLine.rfind(READ, 0) != string::npos) {
