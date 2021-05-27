@@ -43,7 +43,7 @@ void Writer::writeFileDeclarations() {
 	// Iterate through files and write each one as an f stream
 	for (pair<string, string> file : *files) {
 		// Declare current file as fstream object
-		f << "\tfstream " << file.first << "(\"" << file.second << "\", fstream::in | fstream::out | fstream::trunc);\n";
+		f << "\tfstream " << file.first << "(\"" << file.second << "\", fstream::in | fstream::out | fstream::app);\n";
 	}
 }
 
