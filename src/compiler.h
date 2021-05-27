@@ -25,22 +25,18 @@
 #define SCAN "SCAN"
 #define READ "READ"
 
-#define INPUT_SIZE 100
-
 // Regex strings
 #define GENERAL_ACTION "\\s+(\\w*)\\s+\"(.*?)\""	// Regex for parsing general 3-part actions
 #define STATE_VALUE "\\s+(\\w*)\\s*\\[(.*?)\\]"		// Regex for parsing the names and transitions of states
 #define CONSOLE_ACTION	"\\s*\"(.*)\""				// Regex for parsing PRINT and SCAN actions
 #define VALID_IDENTIFIER "^[a-zA-Z_]\\w*$"			// Regex for checking for a valid identifier name
 
-#include <cstdio>
 #include <cctype>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <regex>
-#include <algorithm>
 #include <map>
 #include "writer.h"
 #include "error.h"

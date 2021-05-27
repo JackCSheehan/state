@@ -8,7 +8,7 @@ using namespace std;
 // Class used for storing parsed action info
 class Action {
 public:
-	string name;		// Name of action (e.g. print)
+	string name;		// Name of action (e.g. PRINT)
 	string identifier;	// Optional identifier that some actions have
 	string arg;			// Action argument (e.g. "Hello World")
 
