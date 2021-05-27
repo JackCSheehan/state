@@ -68,8 +68,23 @@ Finally, use `//` to write a comment:
 ```
 
 ### Example: Binary Strings
-The next example will be a little more complicated. This is example is taken from slide 18 of [this](https://courses.cs.washington.edu/courses/cse311/18au/doc/lecture23.pdf) lecture by E. Torlak and K. Zatloukal from the University of Washington. This finite-state machine accepts binary strings that either contain `111` or end in a `0`.
+The next example will be a little more complicated. This is example is adapted from slide 18 of [this](https://courses.cs.washington.edu/courses/cse311/18au/doc/lecture23.pdf) lecture by E. Torlak and K. Zatloukal from the University of Washington. This finite-state machine accepts binary strings that either contain `111` or end in a `0`.
 
 ```
+INPUT z "0"
+INPUT o "1"
 
+SCAN "\n"
+
+STATE s0 [o : s1] {
+	PRINT "Accepted!\n"
+}
+
+STATE s1 [z : s0, o : s2]
+STATE s2 [z : s0, o : s3]
+
+// Notice the blank state transition brackets to indicate an accept state
+STATE s3 [] {
+	PRINT "Accepted!\n"
+}
 ```
