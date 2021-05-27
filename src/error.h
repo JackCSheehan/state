@@ -15,12 +15,10 @@ namespace Error {
 	void missingClosingBrace(int);
 	void missingOpeningBrace(int);
 	void unknownOutputAction(int);
-	void unknownInputAction(int);
 	void malformedAction(int);
 	void noInputs();
 	void noStates();
 	void invalidIdentifier(int, string);
-	void fileNotFound(int, string);
 	void multipleInputActions(int);
 	void invalidDelimiter(int, string);
 	void referencingUndeclaredFile(string);
@@ -28,6 +26,7 @@ namespace Error {
 	void referencingUndeclaredState(string);
 	void noInputActions();
 	void sourceOpenError(string);
+	void unknownStatement(int, string);
 }
 
 #endif

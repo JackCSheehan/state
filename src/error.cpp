@@ -16,19 +16,13 @@ namespace Error {
 
 	// Error thrown if a block is closed without one being opened
 	void missingOpeningBrace(int line) {
-		cerr << ERROR_MESSAGE " Missing opening brace on line " << line << "\n";
+		cerr << ERROR_MESSAGE " Missing opening brace in body of state ending on line " << line << "\n";
 		exit(1);
 	}
 
 	// Error thrown if user tries to run an unknown output action
 	void unknownOutputAction(int line) {
 		cerr << ERROR_MESSAGE " Unknown output action on line " << line << "\n";
-		exit(1);
-	}
-
-	// Error thrown if an input action is unknown
-	void unknownInputAction(int line) {
-		cerr << ERROR_MESSAGE " Unknown input action on line " << line << "\n";
 		exit(1);
 	}
 
@@ -53,12 +47,6 @@ namespace Error {
 	// Error thrown if an identifier is not valid
 	void invalidIdentifier(int line, string id) {
 		cerr << ERROR_MESSAGE " Invalid identifier '" << id << "' at line " << line << "\n";
-		exit(1);
-	}
-
-	// Error thrown if a file does not exist
-	void fileNotFound(int line, string path) {
-		cerr << ERROR_MESSAGE " File '" << path << "'' declared at line " << line << " does not exist\n";
 		exit(1);
 	}
 
@@ -100,7 +88,13 @@ namespace Error {
 
 	// Error thrown if source file could not be opened
 	void sourceOpenError(string path) {
-		cerr << ERROR_MESSAGE " Source file at path '" << path << "' could not be opened. Does the file exist in the given path?\n";
+		cerr << ERROR_MESSAGE " Source file at path '" << path << "' could not be opened. Does the file exist at the given path?\n";
+		exit(1);
+	}
+
+	// Error thrown if parser doesn't know how to handle this line
+	void unknownStatement(int line, string statement) {
+		cerr << ERROR_MESSAGE " Unknown statement '" << statement << "' at line " << line << "\n";
 		exit(1);
 	}
 }
