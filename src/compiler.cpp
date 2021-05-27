@@ -80,7 +80,6 @@ bool Compiler::isValidIdentifier(string id) {
 	if (regex_match(id, regex(VALID_IDENTIFIER)) &&
 		id != IN &&
 		id != STATE &&
-		id != END_STATE &&
 		id != INPUT_TYPE &&
 		id != STATE_TYPE &&
 		id != FILE_TYPE &&
@@ -137,17 +136,17 @@ void Compiler::parseInputAndFileDeclarations(string line) {
 	}
 
 	// Search line with regex
-	if (!regex_search(trimmedLine, matches, *parsingRegex)) return;
+	if (!regex_search(trimmedLine, matches, *parsingRegex)) Error::malformedAction(lineCount);
 
-	// Parse action name and the action arg from the regex
-	string actionName = matches.str(1);
+	// Parse action identifier and the action arg from the regex
+	string actionIdentifier = matches.str(1);
 	string actionArg = matches.str(2);
 
-	// Check that action name is a valid identifier
-	if (!isValidIdentifier(actionName)) Error::invalidIdentifier(lineCount, actionName);
+	// Check that action id is a valid identifier
+	if (!isValidIdentifier(actionIdentifier)) Error::invalidIdentifier(lineCount, actionIdentifier);
 
 	// Adds parsed data to target map
-	targetMap->operator[](actionName) = actionArg;
+	targetMap->operator[](actionIdentifier) = actionArg;
 }
 
 // Parses state definition from given line
@@ -159,7 +158,7 @@ void Compiler::parseState(string line) {
 	if (!regex_search(line, matches, stateRegex)) Error::malformedAction(lineCount);
 
 	// Parse input name, raw transition mapping string, and actions
-	string stateName = matches.str(1);
+	string stateName = trim(matches.str(1));
 
 	// Check that state name is a valid identifier
 	if (!isValidIdentifier(stateName)) Error::invalidIdentifier(lineCount, stateName);
@@ -242,8 +241,6 @@ void Compiler::parseInputAction(string line) {
 		action = Action(READ, readParts.str(1), strDelimToChar(readParts.str(2)));
 	
 	// If this statement is not a valid input action
-	} else  {
-		Error::unknownInputAction(lineCount);
 	}
 
 	inputAction = action;
@@ -364,6 +361,9 @@ void Compiler::parse() {
 		else if (line.find(STATE_TYPE) != string::npos) parseState(line);
 		else if (line.find(SCAN) != string::npos || line.find(READ) != string::npos) parseInputAction(line);
 		else if (attatchAction) parseOutputAction(line);
+		else {
+			if (trim(line) != "") Error::unknownStatement(lineCount, line);
+		}
 
 		// Check if current line has a closing block character
 		if (line.find(BLOCK_END) != string::npos) {
