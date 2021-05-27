@@ -4,6 +4,10 @@
 Compiler::Compiler(string p) {
 	// Initialization
 	src.open(p);
+
+	// Check that source exists
+	if (!src) Error::sourceOpenError(p);
+
 	compiledName = p.substr(0, p.find_last_of(".")) + ".cpp";
 	lineCount = 1;
 	attatchAction = false;
