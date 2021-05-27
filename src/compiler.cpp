@@ -151,7 +151,7 @@ void Compiler::parseState(string line) {
 	smatch matches;
 
 	// Search line with regex
-	if (!regex_search(line, matches, stateRegex)) return;
+	if (!regex_search(line, matches, stateRegex)) Error::malformedAction(lineCount);
 
 	// Parse input name, raw transition mapping string, and actions
 	string stateName = matches.str(1);
@@ -168,6 +168,13 @@ void Compiler::parseState(string line) {
 	if (stateName == END_STATE) Error::endStateClash(lineCount);
 
 	string rawTransitionMap = matches.str(2);
+
+	if (rawTransitionMap.empty()) {
+		map<string, string> blank;
+		blank[""] = "";
+		states[stateName] = blank;
+		return;
+	}
 
 	// Create string vector to hold split transition map
 	vector<string> transitionMapSplit;
@@ -319,13 +326,14 @@ void Compiler::checkForParseErrors() {
 		// Iterate through each transition
 		for (pair<string, string> trans : state.second) {
 			// If transition input does not exist in inputs, throw error
-			if (!inputs.count(trans.first)) Error::referencingUndeclaredInput(trans.first);
+			if (!trans.first.empty() && !inputs.count(trans.first))
+				Error::referencingUndeclaredInput(trans.first);
 
 			// If transition target state does not exist in states, throw error
-			if (!states.count(trans.second)) Error::referencingUndeclaredState(trans.second);
+			if (!trans.second.empty() &&!states.count(trans.second))
+				Error::referencingUndeclaredState(trans.second);
 		}
 	}
-
 }
 
 // Parses source files

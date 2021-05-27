@@ -10,7 +10,7 @@ State is designed entirely to create finite-state machines. Its workflow involve
 ### Getting Started
 The State compiler implemented in this repository does not enforce a particular file extension, but the convention is to use `.statelang` files.
 
-### Example: Turnstile
+### Language Overview
 Create a `.statelang` file. We'll start by implementing the famous [turnstile finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine#Example:_coin-operated_turnstile). Declare possible inputs using the `INPUT` keyword: 
 ```
 INPUT push "push"
@@ -23,9 +23,11 @@ Declare states by using the `STATE` keyword:
 STATE locked [coin: unlocked]
 STATE unlocked [push: locked]
 ```
+The first state defined in the file is the state that the finite-state machine will start at.
+
 States also need transitions, which are defined in brackets (`[` and `]`). Inside the brackets, a comma-separated list of mappings are defined. These mappings tell State which state to switch to when the given input is encountered. Any inputs not included in the transition definition will simply become loops back to the current state.
 
-Finally, State allows users to define an input source using the `SCAN` and `READ` keywords. In this example, we'll get input from the console using `SCAN` and we'll make the delimiter a newline character:
+State allows users to define an input source using the `SCAN` and `READ` keywords. In this example, we'll get input from the console using `SCAN` and we'll make the delimiter a newline character:
 ```
 SCAN "\n"
 ```
@@ -39,5 +41,35 @@ The first argument is an identifier name and the second argument is the path to 
 ```
 READ input "\n"
 ```
+Only one input action (`READ` and `SCAN`) can be defined in one `.statelang` file.
 
-*more coming soon*
+State also allows developers to attach output actions to each state. Output actions are run once a state is transitioned to. Use braces to attach output actions to a state:
+```
+STATE locked [coin: unlocked] {
+	PRINT "Unlocked!\n"
+}
+STATE unlocked [push: locked] {
+	PRINT "Locked!\n"
+}
+```
+Use `PRINT` to print directly to the console. `WRITE` could also have been used to write to a declared file:
+```
+STATE locked [coin: unlocked] {
+	WRITE output "Unlocked!\n"
+}
+STATE unlocked [push: locked] {
+	PRINT output "Locked!\n"
+}
+```
+
+Finally, use `//` to write a comment:
+```
+// This is a comment!
+```
+
+### Example: Binary Strings
+The next example will be a little more complicated. This is example is taken from slide 18 of [this](https://courses.cs.washington.edu/courses/cse311/18au/doc/lecture23.pdf) lecture by E. Torlak and K. Zatloukal from the University of Washington. This finite-state machine accepts binary strings that either contain `111` or end in a `0`.
+
+```
+
+```

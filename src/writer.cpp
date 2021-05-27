@@ -66,6 +66,9 @@ void Writer::writeLogic() {
 
 	// Write case for each state to switch states
 	for (pair<string, map<string, string>> state : *states) {
+		// If no transition, do not write the state transition logic for this state
+		if (state.second.count("")) continue;
+
 		f << "\t\tcase " << state.first << ":\n";
 
 		writeIf = true;
