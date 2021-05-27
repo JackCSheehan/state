@@ -103,4 +103,10 @@ namespace Error {
 		cerr << ERROR_MESSAGE " At least one input action must be defined\n";
 		exit(1);
 	}
+
+	// Error thrown if source file could not be opened
+	void sourceOpenError(string path) {
+		cerr << ERROR_MESSAGE " Source file at path '" << path << "' could not be opened. Does the file exist in the given path?\n";
+		exit(1);
+	}
 }

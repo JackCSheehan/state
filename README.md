@@ -71,7 +71,7 @@ Finally, use `//` to write a comment:
 // This is a comment!
 ```
 
-### Keywords and Actions
+### Keyword and Action Reference
 Keyword/Action|Description
 -|-
 `INPUT`|Used to define a valid input to the finite-state machine. Input value must always been in quotes.

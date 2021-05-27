@@ -28,6 +28,7 @@ namespace Error {
 	void referencingUndeclaredInput(string);
 	void referencingUndeclaredState(string);
 	void noInputActions();
+	void sourceOpenError(string);
 }
 
 #endif
