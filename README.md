@@ -7,7 +7,7 @@ State is designed to easily create finite-state machines. Its workflow involves 
 ### Setting Up
 To compile from source, download the source code from the latest release. Navigate to the source directory in a terminal and run a compiler on the source files. The exact compile command will depend on which C++ compiler you're using.
 
-Alternatively, if you're on Windows, you can download a 32-bit `.exe` from the releases tab directly.
+Alternatively, if you're on Windows, you can download an `.exe` from the releases tab directly.
 
 To compile your State source file run the following command:
 `$ statec.exe path/to/file.statelang`
