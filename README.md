@@ -80,6 +80,7 @@ Keyword/Action|Description
 `PRINT`|Prints the given value in quotes to the console.
 `WRITE`|Writes the given value in quotes to the given file.
 `SCAN`|Reads input from the console separated by the given delimiter.
+`READ`|Reads input from the given file separated by the given delimiter.
 `//`|Creates a comment. Comments can be on the same line as other statements, but a line starting with a comment symbol will be entirely ignored.
 `$in`|Used when the current output needs to be printed to the console or written to a file. Simply use `$in` in the quotes of a `PRINT` or `WRITE` to display the most recent input. e.g. `PRINT "The input is: $in"`.
 `END`|`END` is a built-in state. The program will end when either the `END` state has been reached or the file being read from no longer has any data left to read. The State compiler will throw an error if the user attempts to manually define the `END` state.
