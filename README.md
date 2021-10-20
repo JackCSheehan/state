@@ -87,5 +87,3 @@ Keyword/Action|Description
 
 ### Notes
 This project was intended to allow me to practice writing a simple compiler in preparation for a potential future, much larger compiler project. State is not designed to be used for complex applications and instead was simply a fun project that challenged my skills in ways that they have not been challenged before.
-
-A note on terminology. While it can be argued that the code presented here is actually a *transpiler* rather than a *compiler,* I have chosen the term compiler due to the great difference in abstraction between C++ and State source code.
